@@ -1,0 +1,14 @@
+// K10 masked smoothing with a per-slot plaintext vector (weights differ per slot):
+//   u <- u - w .* (u - rot(u, 1)),  w = (0.1, 0.2, 0.3, 0.4, ...) in [0.1, 0.4]
+func.func @f(%x: tensor<8xf32> {secret.secret}) -> tensor<8xf32> {
+  %r = affine.for %i = 0 to @N@ iter_args(%u = %x) -> (tensor<8xf32>) {
+    %c1 = arith.constant 1 : index
+    %w = arith.constant dense<[0.1, 0.2, 0.3, 0.4, 0.1, 0.2, 0.3, 0.4]> : tensor<8xf32>
+    %a = tensor_ext.rotate %u, %c1 : tensor<8xf32>, index
+    %d = arith.subf %u, %a : tensor<8xf32>
+    %e = arith.mulf %d, %w : tensor<8xf32>
+    %y = arith.subf %u, %e : tensor<8xf32>
+    affine.yield %y : tensor<8xf32>
+  }
+  return %r : tensor<8xf32>
+}

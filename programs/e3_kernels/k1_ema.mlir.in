@@ -1,0 +1,12 @@
+// K1 EMA filter with the incremental update m <- m + 0.125 (x_i - m), x_i = rot(x, i)
+func.func @f(%x: tensor<16xf32> {secret.secret}) -> tensor<16xf32> {
+  %r = affine.for %i = 0 to @N@ iter_args(%m = %x) -> (tensor<16xf32>) {
+    %al = arith.constant dense<0.125> : tensor<16xf32>
+    %xi = tensor_ext.rotate %x, %i : tensor<16xf32>, index
+    %e = arith.subf %xi, %m : tensor<16xf32>
+    %d = arith.mulf %e, %al : tensor<16xf32>
+    %y = arith.addf %m, %d : tensor<16xf32>
+    affine.yield %y : tensor<16xf32>
+  }
+  return %r : tensor<16xf32>
+}

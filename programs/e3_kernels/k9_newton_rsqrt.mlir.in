@@ -1,0 +1,14 @@
+// K9 Newton iteration for 1/sqrt(a), a = 0.5:  y <- y (1.5 - 0.25 y^2),  y0 in [1, 1.5]
+// range %y = [1, 1.5]
+func.func @f(%y: f32 {secret.secret}) -> f32 {
+  %r = affine.for %i = 0 to @N@ iter_args(%u = %y) -> (f32) {
+    %h = arith.constant 1.5 : f32
+    %q = arith.constant 0.25 : f32
+    %u2 = arith.mulf %u, %u : f32
+    %v = arith.mulf %u2, %q : f32
+    %t = arith.subf %h, %v : f32
+    %z = arith.mulf %u, %t : f32
+    affine.yield %z : f32
+  }
+  return %r : f32
+}

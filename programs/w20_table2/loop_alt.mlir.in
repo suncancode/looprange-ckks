@@ -1,0 +1,9 @@
+// Test 4: repeat N times:  x <- 1 - x   (bounded: the value stays in [-1, 2])
+func.func @f(%x: f32 {secret.secret}) -> f32 {
+  %r = affine.for %i = 0 to @N@ iter_args(%acc = %x) -> (f32) {
+    %one = arith.constant 1.0 : f32
+    %y = arith.subf %one, %acc : f32
+    affine.yield %y : f32
+  }
+  return %r : f32
+}

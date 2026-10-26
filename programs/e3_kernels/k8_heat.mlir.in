@@ -1,0 +1,17 @@
+// K8 heat diffusion on a ring (rotations):  u <- u + 0.25 ((rot(u,1) + rot(u,-1)) - (u + u))
+func.func @f(%x: tensor<16xf32> {secret.secret}) -> tensor<16xf32> {
+  %r = affine.for %i = 0 to @N@ iter_args(%u = %x) -> (tensor<16xf32>) {
+    %c1 = arith.constant 1 : index
+    %cm1 = arith.constant 15 : index
+    %al = arith.constant dense<0.25> : tensor<16xf32>
+    %a = tensor_ext.rotate %u, %c1 : tensor<16xf32>, index
+    %b = tensor_ext.rotate %u, %cm1 : tensor<16xf32>, index
+    %s = arith.addf %a, %b : tensor<16xf32>
+    %uu = arith.addf %u, %u : tensor<16xf32>
+    %lap = arith.subf %s, %uu : tensor<16xf32>
+    %d = arith.mulf %lap, %al : tensor<16xf32>
+    %y = arith.addf %u, %d : tensor<16xf32>
+    affine.yield %y : tensor<16xf32>
+  }
+  return %r : tensor<16xf32>
+}

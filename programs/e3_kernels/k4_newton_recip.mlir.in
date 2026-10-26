@@ -1,0 +1,13 @@
+// K4 Newton iteration for 1/a with a = 0.75:  x <- x (2 - 0.75 x),  x0 in [0.5, 1.5]
+// range %x = [0.5, 1.5]
+func.func @f(%x: f32 {secret.secret}) -> f32 {
+  %r = affine.for %i = 0 to @N@ iter_args(%u = %x) -> (f32) {
+    %a = arith.constant 0.75 : f32
+    %two = arith.constant 2.0 : f32
+    %ax = arith.mulf %u, %a : f32
+    %t = arith.subf %two, %ax : f32
+    %y = arith.mulf %u, %t : f32
+    affine.yield %y : f32
+  }
+  return %r : f32
+}

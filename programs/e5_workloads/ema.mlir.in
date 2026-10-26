@@ -1,0 +1,15 @@
+// E5-B: exponential moving average over a packed signal x (e.g. a normalised ECG window),
+// computed for every start position at once, @N@ steps:
+//   m <- m + 0.125 * (rot(x, i) - m)          (the incremental form, with a subtraction)
+// Since m is a convex combination of samples, every m_k stays in [-1, 1].
+func.func @f(%x: tensor<@S@xf32> {secret.secret}) -> tensor<@S@xf32> {
+  %r = affine.for %i = 0 to @N@ iter_args(%m = %x) -> (tensor<@S@xf32>) {
+    %al = arith.constant dense<0.125> : tensor<@S@xf32>
+    %xi = tensor_ext.rotate %x, %i : tensor<@S@xf32>, index
+    %e = arith.subf %xi, %m : tensor<@S@xf32>
+    %d = arith.mulf %e, %al : tensor<@S@xf32>
+    %y = arith.addf %m, %d : tensor<@S@xf32>
+    affine.yield %y : tensor<@S@xf32>
+  }
+  return %r : tensor<@S@xf32>
+}

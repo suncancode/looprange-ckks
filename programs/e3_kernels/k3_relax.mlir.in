@@ -1,0 +1,12 @@
+// K3 relaxation towards 8:  x <- x - 0.25 (x - 8)
+func.func @f(%x: f32 {secret.secret}) -> f32 {
+  %r = affine.for %i = 0 to @N@ iter_args(%u = %x) -> (f32) {
+    %eight = arith.constant 8.0 : f32
+    %q = arith.constant 0.25 : f32
+    %t = arith.subf %u, %eight : f32
+    %v = arith.mulf %t, %q : f32
+    %y = arith.subf %u, %v : f32
+    affine.yield %y : f32
+  }
+  return %r : f32
+}

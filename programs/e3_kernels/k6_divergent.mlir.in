@@ -1,0 +1,11 @@
+// K6 divergent affine map:  x <- 1.3 x + 0.5
+func.func @f(%x: f32 {secret.secret}) -> f32 {
+  %r = affine.for %i = 0 to @N@ iter_args(%u = %x) -> (f32) {
+    %a = arith.constant 1.3 : f32
+    %b = arith.constant 0.5 : f32
+    %m = arith.mulf %u, %a : f32
+    %y = arith.addf %m, %b : f32
+    affine.yield %y : f32
+  }
+  return %r : f32
+}

@@ -1,0 +1,5 @@
+# LoopRange itself (src/looprange3/) uses only the Python standard library.
+# The end-to-end experiments (E1, E2, E5) also need HEIR and Go >= 1.23 (Lattigo v6.2.0 is fetched by go).
+heir_py==2026.9.1
+# tests
+pytest

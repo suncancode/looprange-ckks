@@ -1,0 +1,14 @@
+// E5-C: the same moving average on RAW sensor counts (a 12-bit ADC: values in [-2048, 2048]),
+// i.e. without normalising the data first.
+// range %x = [-2048, 2048]
+func.func @f(%x: tensor<@S@xf32> {secret.secret}) -> tensor<@S@xf32> {
+  %r = affine.for %i = 0 to @N@ iter_args(%m = %x) -> (tensor<@S@xf32>) {
+    %al = arith.constant dense<0.125> : tensor<@S@xf32>
+    %xi = tensor_ext.rotate %x, %i : tensor<@S@xf32>, index
+    %e = arith.subf %xi, %m : tensor<@S@xf32>
+    %d = arith.mulf %e, %al : tensor<@S@xf32>
+    %y = arith.addf %m, %d : tensor<@S@xf32>
+    affine.yield %y : tensor<@S@xf32>
+  }
+  return %r : tensor<@S@xf32>
+}

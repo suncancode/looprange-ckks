@@ -1,0 +1,12 @@
+// Test 5 (with a multiplication): repeat N times:  x <- x - 0.25 * (x - 8)
+func.func @f(%x: f32 {secret.secret}) -> f32 {
+  %r = affine.for %i = 0 to @N@ iter_args(%acc = %x) -> (f32) {
+    %eight = arith.constant 8.0 : f32
+    %quarter = arith.constant 0.25 : f32
+    %t = arith.subf %acc, %eight : f32
+    %u = arith.mulf %t, %quarter : f32
+    %y = arith.subf %acc, %u : f32
+    affine.yield %y : f32
+  }
+  return %r : f32
+}

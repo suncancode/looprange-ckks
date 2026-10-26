@@ -1,0 +1,19 @@
+// E5-A: explicit heat diffusion on a ring of @S@ points, @N@ steps:
+//   u <- u + 0.25 * ((rot(u, 1) + rot(u, -1)) - (u + u))
+// Stable (alpha = 0.25 <= 0.5), so every u_k stays in the input range [-1, 1] (maximum principle).
+func.func @f(%x: tensor<@S@xf32> {secret.secret}) -> tensor<@S@xf32> {
+  %r = affine.for %i = 0 to @N@ iter_args(%u = %x) -> (tensor<@S@xf32>) {
+    %c1 = arith.constant 1 : index
+    %cm1 = arith.constant @SM1@ : index
+    %al = arith.constant dense<0.25> : tensor<@S@xf32>
+    %a = tensor_ext.rotate %u, %c1 : tensor<@S@xf32>, index
+    %b = tensor_ext.rotate %u, %cm1 : tensor<@S@xf32>, index
+    %s = arith.addf %a, %b : tensor<@S@xf32>
+    %uu = arith.addf %u, %u : tensor<@S@xf32>
+    %lap = arith.subf %s, %uu : tensor<@S@xf32>
+    %d = arith.mulf %lap, %al : tensor<@S@xf32>
+    %y = arith.addf %u, %d : tensor<@S@xf32>
+    affine.yield %y : tensor<@S@xf32>
+  }
+  return %r : tensor<@S@xf32>
+}
